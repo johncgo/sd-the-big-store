@@ -52,6 +52,69 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin 
+   product-api:
+    build: './product-api/product-api'
+    container_name: product-api
+    depends_on:
+      - product-db
+      - sales_rabbit
+    networks:
+      - sales-network
+    environment:
+      - PORT=8081
+      - API_SECRET=YXV0aC1hcGktc2VjcmV0LWNvbnRhaW5lci0xMjM0NTY=
+      - DB_HOST=product-db
+      - DB_NAME=product-db
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - DB_PORT=5432
+      - RABBIT_MQ_HOST=sales_rabbit
+      - RABBIT_MQ_PORT=5672
+      - RABBIT_MQ_USER=admin
+      - RABBIT_MQ_PASSWORD=admin
+      - SALES_HOST=sales-api
+      - SALES_PORT=8082
+    ports:
+      - 8081:8081
+
+   sales-api:
+    build: './sales-api'
+    container_name: sales-api
+    depends_on:
+      - sales-db
+      - sales_rabbit
+      - product-api
+    networks:
+      - sales-network
+    environment:
+      - PORT=8082
+      - API_SECRET=YXV0aC1hcGktc2VjcmV0LWNvbnRhaW5lci0xMjM0NTY=
+      - MONGO_DB_URL=mongodb://admin:admin@sales-db:27017/
+      - RABBIT_MQ_URL=amqp://guest:guest@sales_rabbit:5672/
+      - PRODUCT_API_URL=http://product-api:8081/api/product
+      - NODE_ENV=container
+    ports:
+      - 8082:8082
+
+   auth-api:
+    build: './auth-api'
+    container_name: auth-api
+    depends_on:
+      - auth-db
+      - product-api
+    networks:
+      - sales-network
+    environment:
+      - PORT=8080
+      - API_SECRET=YXV0aC1hcGktc2VjcmV0LWNvbnRhaW5lci0xMjM0NTY=
+      - DB_HOST=auth-db
+      - DB_NAME=auth-db
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - DB_PORT=5432
+      - NODE_ENV=container
+    ports:
+      - 8080:8080
 networks:
   sales-network:
     driver: bridge
