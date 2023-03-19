@@ -14,7 +14,7 @@ class UserService {
             this.validarDadosRequisicao(email);
             let user = await UserRepository.findByEmail(email);
             this.validarUsuarioNotFound(user);
-            tihis.validateAuthenticationUser(user, authUser);
+            this.validateAuthenticationUser(user, authUser);
             return {
                 status: httpStatus.SUCCESS,
                 user: {
