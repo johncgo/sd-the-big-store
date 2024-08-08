@@ -16,7 +16,7 @@ public class StatusController {
     public ResponseEntity<HashMap<String, Object>> getApiStatus(){
         var response = new HashMap<String, Object>();
 
-        response.put("servoce", "Product-API");
+        response.put("service", "Product-API");
         response.put("status","up");
         response.put("httpStatus", HttpStatus.OK.value());
 
